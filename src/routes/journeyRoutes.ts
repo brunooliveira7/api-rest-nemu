@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-// Configuração do Multer para salvar o arquivo em memória
+// Salvar o arquivo em memória
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Rota para fazer o upload e processar a planilha
