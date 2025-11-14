@@ -1,7 +1,6 @@
-//leitura da planilha e o processamento das jornadas
 import * as XLSX from "xlsx";
 
-// Verificar a planilha para outros campos - se necessário
+// Estruturas dos dados após o processamento
 interface TouchPoint {
   sessionId: string;
   created_at: Date;
@@ -13,42 +12,48 @@ interface Journey {
   touchPoints: { channel: string; created_at: Date }[];
 }
 
-//BD - memória para armazenar as jornadas processadas
+// "Banco de dados volátil" - jornadas processadas
 let processedJourneys: Journey[] = [];
 
-//Processa o buffer do arquivo Excel, extrai e trata as jornadas.
+// Processa o buffer do arquivo Excel, extrai e trata as jornadas
 export const processExcelFile = (buffer: Buffer): void => {
   const workbook = XLSX.read(buffer, { type: "buffer" });
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
 
-  // Converte a planilha para JSON - ajuste o 'header' se os nomes das colunas estiverem errados
-  const data: TouchPoint[] = XLSX.utils.sheet_to_json(worksheet, {
-    raw: false, // para formatar datas corretamente
+  // Lê a planilha como JSON bruto
+  const rawData = XLSX.utils.sheet_to_json(worksheet, {
+    raw: false,
     dateNF: "yyyy-mm-dd hh:mm:ss",
   });
 
-  //Agrupar eventos por sessionId
+  // Mapeia os campos da planilha para o formato esperado pelo sistema
+  const data: TouchPoint[] = rawData.map((row: any) => ({
+    sessionId: row.sessionId,         
+    created_at: new Date(row.createdAt), 
+    channel: row.utm_source,           
+  }));
+
+  // Agrupar eventos por sessionId
   const journeysMap = new Map<string, TouchPoint[]>();
+
   for (const event of data) {
     if (!journeysMap.has(event.sessionId)) {
       journeysMap.set(event.sessionId, []);
     }
 
-    // Converte a string de data para um objeto Date para ordenação
-    event.created_at = new Date(event.created_at);
     journeysMap.get(event.sessionId)!.push(event);
   }
 
   const finalJourneys: Journey[] = [];
 
-  //Processar cada jornada individualmente
+  // Processar cada jornada individualmente
   for (const [sessionId, events] of journeysMap.entries()) {
-    //Ordenar eventos - data de criação
+    // Ordenar eventos pela data
     events.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
 
+    // Se existem apenas 2 pontos ou menos, não há "meio" para limpar
     if (events.length <= 2) {
-      //Se a jornada tem 2 ou menos pontos, não há "meio" para limpar
       finalJourneys.push({
         sessionId,
         touchPoints: events.map((e) => ({
@@ -59,7 +64,7 @@ export const processExcelFile = (buffer: Buffer): void => {
       continue;
     }
 
-    // 3. Aplicar regras de limpeza
+    // Regras de limpeza
     const firstTouchPoint = events[0];
     const lastTouchPoint = events[events.length - 1];
     const middleTouchPoints = events.slice(1, -1);
@@ -92,7 +97,7 @@ export const processExcelFile = (buffer: Buffer): void => {
   processedJourneys = finalJourneys;
 };
 
-// Retorna as jornadas que foram processadas e estão em memória.
+// Retorna as jornadas processadas em memória
 export const getJourneys = (): Journey[] => {
   return processedJourneys;
 };
