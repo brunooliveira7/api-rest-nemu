@@ -57,18 +57,6 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente local
 
 ---
 
-## 📁 Estrutura do Arquivo Excel
-
-Para que o processamento ocorra corretamente, o arquivo Excel (`.xlsx`) enviado deve conter uma planilha com as seguintes colunas:
-
-| Coluna      | Tipo   | Descrição                                         | Exemplo                 |
-| :---------- | :----- | :-------------------------------------------------- | :---------------------- |
-| `sessionId` | string | Identificador único da sessão do usuário.           | `aaa-bbb-ccc-ddd`       |
-| `createdAt` | string | Data e hora do evento no formato ISO 8601.        | `2023-10-27T10:00:00Z`  |
-| `utm_source`| string | Canal de origem do ponto de contato (touchpoint). | `google`                |
-
----
-
 ## ⚙️ Endpoints da API (Instruções para Insomnia)
 
 ### 1. Upload e Processamento de Jornadas
