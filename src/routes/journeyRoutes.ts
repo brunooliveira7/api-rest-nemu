@@ -1,6 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
-import { uploadJourneys, getProcessedJourneys } from "../controllers/journeyController";
+import {
+  uploadJourneys,
+  getProcessedJourneys,
+} from "../controllers/journeyController";
 
 const router = Router();
 
@@ -10,4 +13,3 @@ router.post("/journeys/upload", upload.single("sheet"), uploadJourneys);
 router.get("/journeys", getProcessedJourneys);
 
 export default router;
-
