@@ -44,16 +44,13 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente local
     ```bash
     npm install
     ```
-    *ou, se estiver usando yarn:*
-    ```bash
-    yarn install
-    ```
+ 
 
 3.  **Inicie o servidor de desenvolvimento:**
     ```bash
     npm run dev
     ```
-    O servidor estará em execução em `http://localhost:3000` (ou na porta configurada).
+    O servidor estará em execução em `http://localhost:3333`
 
 ---
 
