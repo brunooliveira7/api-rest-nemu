@@ -14,7 +14,7 @@ interface TouchPoint {
   channel: string;
 }
 
-//jornada do user
+//jornada completa do user
 interface Journey {
   sessionId: string;
   touchPoints: { channel: string; created_at: Date }[];
@@ -27,7 +27,7 @@ export const processExcelFile = (buffer: Buffer): void => {
   const workbook = XLSX.read(buffer, { type: "buffer" });
   //Garante leitura na primeira aba
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  //Converte para array de objs
+  //Converte linha em array de objs
   const raw: Row[] = XLSX.utils.sheet_to_json(sheet);
 
   //Convert o dado bruto para formato - TouchPoint
@@ -46,6 +46,7 @@ export const processExcelFile = (buffer: Buffer): void => {
 
   const journeys: Journey[] = [];
 
+  //processamento e limpeza da jornada
   groups.forEach((events, sessionId) => {
     //Ordena por data
     events.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
@@ -65,8 +66,10 @@ export const processExcelFile = (buffer: Buffer): void => {
     const first = events[0];
     const last = events[events.length - 1];
 
-    //Remove canais duplicados - meio
-    const seen = new Set<string>();
+    //Marca primeiro e último - vistos
+    const seen = new Set<string>([first.channel, last.channel]);
+
+    //Filtra o meio remove duplicatas, incluindo do primeiro e último
     const middle = events.slice(1, -1).filter((ev) => {
       if (seen.has(ev.channel)) return false;
       seen.add(ev.channel);
@@ -87,4 +90,5 @@ export const processExcelFile = (buffer: Buffer): void => {
   processedJourneys = journeys;
 };
 
+//Dados já processados
 export const getJourneys = (): Journey[] => processedJourneys;
