@@ -6,10 +6,8 @@ const PORT = 3333;
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 
-//Rotas de jornadas
 app.use("/api", journeyRoutes);
 
 app.listen(PORT, () =>

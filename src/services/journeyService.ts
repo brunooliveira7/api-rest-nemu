@@ -23,9 +23,7 @@ interface Journey {
 let processedJourneys: Journey[] = [];
 
 export const processExcelFile = (buffer: Buffer): void => {
-  //XLSX lê o arquivo
   const workbook = XLSX.read(buffer, { type: "buffer" });
-  //Garante leitura na primeira aba
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   //Converte linha em array de objs
   const raw: Row[] = XLSX.utils.sheet_to_json(sheet);
